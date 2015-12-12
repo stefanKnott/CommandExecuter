@@ -1,0 +1,39 @@
+Clear Text Passwords (Caught!) Use Case
+
+Nov 2, 2015 Kjell Hedström 
+The Challenge
+
+Having clear text credentials on your corporate network can make your organization vulnerable. Detecting them early and notifying the users, as well as the IT department, could stop a very real threat to your company.
+
+Many internal services require a login. In some cases, the login is chained to single-sign-on. If these services are not configured to be secure, they might send user authentication over clear text HTTP. It’s even worse if the services are connected to Windows Active Directory. Any unsecured login will put the user’s domain credentials in clear text over your corporate network.
+
+The Solution
+
+Using a simple Analyze query on Network Monitor, you can detect clear text passwords sent over HTTP.
+
+_exists_:AuthPass AND NOT AuthPass:xoauth-basi
+
+Figure 1. Analyze Query
+This query can be saved (using the blue button on the right) as an alarm query. Any hits will then propagate to the SIEM.
+
+Using Deep Analytics Scripts (or Deep Scripts), we can capture the same alarm. We can also bundle this alarm and install it on your Network Monitor.
+
+In this instance, I created a Deep Script rule, Flow_DetectClearTextPasswords, that can be bundled with Network Monitor or released separately.
+
+With just a few lines of code, I can detect the clear text credentials. I also created custom meta data fields to send the alarm to the SIEM with the username and the masked password. (I figured masking the password wouldn’t hurt.)
+
+The Benefits
+
+Existing customers can upload this Deep Script Rule and immediately begin to see vulnerabilities of this type. You can then easily tune it to your organization’s specific needs.
+
+When testing this on a customer’s system, we were able to discover several systems exposing user credentials. We used the search query "_exists_:AuthPass AND NOT AuthPass:xoauth-basi" and added some filtering to find real users instead of automated build jobs.
+
+As a result, we found about 20 users who had logged in over the last few days with clear text credentials—without even knowing it!
+
+Over the course of 5 days, the filtered search found about 180 logins with clear text credentials.
+
+Working with the customer, we realized that it would be easy to mitigate the problem, at least partially, by alerting the users to install SSH keys to their GitHub accounts. This would encrypt the traffic that required authentication. GitHub was not the sole service that was unprotected, but in the case of this customer, it was the largest contributor.
+
+We also released the Flow_DetectClearTextPasswords rule for our customers to use. The system rules are installed by default when customers upgrade or install Network Monitor 2.7.2.
+
+You can download Network Monitor 2.7.2 at the download portal. Once installed, you can find the System Rules at Configuration > Deep Packet Analytics.

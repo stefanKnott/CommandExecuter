@@ -1,0 +1,43 @@
+When the Threat Comes from Within
+
+Nov 16, 2015 Simon Howe 
+Threats are evolving at a rapid pace. Not only are they more sophisticated, but they are also increasingly entering the corporate network via different means of attack.
+
+Organizations have traditionally been more fearful of external threats to their confidential documents; however, the threat posed by insiders is an equally serious matter.
+
+While the insider threat may be making its way up the corporate agenda, what is not clear is how organizations are dealing with corrupt employee activity.
+
+Nearly three-quarters of workers believe the greatest threat to data security is employee-related, due to staff downloading infected files or malware, or simply not thinking about security, according to a recent workplace security survey we conducted in Australia.
+
+Stealing Data
+
+The extent of data security exposure that organizations are facing can be seen when relatively small overall percentages are extrapolated into real numbers: the 12% of respondents who admitted to having accessed or taken confidential documents from their workplace without proper authority potentially equates to 719,000 employees across Australia.
+
+Of great concern, too, is that from that group of respondents, 7% accessed those documents after they had stopped working for the company—the main reason being to help them in their new job. This is a very real example of lost confidentiality and IP.
+
+Yet, despite this growing awareness, there is still a stark lack of understanding when it comes to having systems in place to protect corporate data from employees. While 95% of managers say that their company “is serious about the security of information,” the reality is that 42% of employees don’t have, or aren’t aware of systems such as passwords and IT checks in place to stop their unauthorized access of data.
+
+Survey fact
+It’s undoubtedly a continuous struggle for many organizations to protect their networks from both internal and external threats, but every business needs to ensure it is doing everything it can to stop its data falling into the wrong hands.
+
+Logic would suggest that as organizations come to recognize the potential security threat employees can pose, they would increase their defenses. Unfortunately, this doesn’t seem to be the case.
+
+The discrepancy between organizations’ growing security concerns and what they are actually doing when faced with an insider threat, suggests that they still have very little idea of what is happening on the network or the repercussions failed security can bring.
+
+In fact, a third of businesses in the UK cannot even say whether their organization has ever suffered a data breach—something that really should be the bare minimum.
+
+Vital Visibility
+
+Organizations need to make sure they have full visibility of everything that is happening on their network so that they can spot any questionable activity as soon as it occurs.
+
+Part of the problem is that many businesses believe that they are adequately protected from today’s threats by just having point security solutions, such as antivirus and firewalls, in place.
+
+While there is no denying that these tools still have their merits, they simply cannot protect against the sophisticated attacks of today alone—in particular regarding the insider threat.
+
+Without the ability to know exactly what is happening on the network and understand what “normal” activity looks like, employees could potentially remove data from the organization and remain undetected for some time.
+
+Ultimately, organizations are beginning to realize that the insider threat can prove to be just as big a danger when it comes to data theft as those on the outside. However, actions to mitigate this threat are slow in catching up.
+
+With business productivity increasingly relying on a strong security strategy, it’s imperative that organizations focus on monitoring illicit access, not just from the outside, but also within their own walls.
+
+Only by having continuous insight and being able to recognize any anomalous activities, will organizations be able to provide adequate network protection—from both internal and external threats.

@@ -1,0 +1,36 @@
+Gartner Scores LogRhythm as a Leader in All Three Critical Capabilities Use Cases
+
+Nov 2, 2015 Chris Petersen 
+As a co-founder and CTO of LogRhythm, I have to admit, it makes me immensely proud to get news that Gartner has scored LogRhythm highest compared to 12 other vendors when evaluating solution capabilities.
+
+About the Report
+
+If you’re not familiar with Gartner’s Critical Capabilities for Security Information and Event Management, the report enables IT security managers to align their needs with one of the most common use cases:
+
+Compliance
+Threat Management
+SIEM
+The Gartner report assessed the companies according to the following critical capabilities:
+
+Real-time monitoring
+Threat intelligence
+Behavioral profiling
+Data and user monitoring
+Application monitoring
+Analytics
+Log management and reporting
+Deployment support and simplicity
+The report then applied appropriate weights to those different ratings—based on the requirements of each use case—to calculate the final scores.
+
+
+According to the report, "Critical Capabilities are attributes that differentiate products/services in a class in their terms of quality and performance. Gartner recommends that users consider the set of critical capabilities as some of the most important criteria for acquisition decisions."
+
+The authors continued, "LogRhythm is optimal for organizations that require balanced SIEM capabilities combined with endpoint and network monitoring to support security operations and compliance use cases."
+
+Read the Full Report
+
+What it Means
+
+Receiving the highest scores in all three use cases for SIEM speaks volumes about LogRhythm’s leadership in technology, innovation and capabilities that address the most pressing of our customers in the areas of threat management, security and compliance. For me, this report validates the excellence and dedication of our engineering and product teams.
+
+With this latest recognition—and a myriad of other similar distinctions this year from SANS Institute, Frost & Sullivan, Info-Tech Research Group, Gartner Magic Quadrant and SC Magazine—the message is crystal clear that LogRhythm is the hands-down leader in next-gen SIEM, security intelligence and analytics.
