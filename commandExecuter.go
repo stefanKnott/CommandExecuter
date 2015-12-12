@@ -75,11 +75,10 @@ func wordFreq(filename string , word string){
 //Consume work to be done, spinning up new goroutine for each command
 func consume(cmdChan chan cmdWrap){
 	defer wg.Done()
-	for res := range recChan{
-		fmt.Println(res)
+	for res := range cmdChan{
 		switch(res.cmd[0]){
 		case "CHECKSUM":
-			wg.Add(1)
+			//wg.Add(1)
 			//go checkSum(record[1])
 		case "WORDCOUNT":
 			wg.Add(1)
@@ -93,7 +92,7 @@ func consume(cmdChan chan cmdWrap){
 	}
 }
 
-//Produce work to be done using csv package to read comma seperated command values in commandl=_file.txt
+//Produce work to be done using csv package to read comma seperated command values in command_file.txt
 func produce(cmdChan chan cmdWrap){
 	defer wg.Done()
 	cmds, _ := os.Open("command_file.txt")
