@@ -14,8 +14,9 @@ import (
 
 var wg sync.WaitGroup
 
-type cmdWrap struct{
-	cmd []string
+type output struct{
+	filename, word, count string
+	dur time.Duration
 }
 
 func checkSum(filename string){
@@ -56,11 +57,9 @@ func wordFreq(filename string , word string){
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	totWc := 0
 	wc := 0
 	for scanner.Scan(){
 		words := strings.Fields(scanner.Text())
-		totWc += len(words)
 		for _, lword := range words{
 			if lword == word || lword == word +","{
 				wc += 1
@@ -69,32 +68,11 @@ func wordFreq(filename string , word string){
 	}
 
 	dur := time.Since(startTime)
-	fmt.Printf("WORDFREQ, %s, %s, %.3f, %v\n", filename, word, float64(wc)/float64(totWc), dur)
+	fmt.Printf("WORDFREQ, %s, %s, %d, %v\n", filename, word, wc, dur)
 }
 
-//Consume work requests, spinning up new goroutine for each command
-func consume(cmdChan chan cmdWrap){
-	defer wg.Done()
-	for res := range cmdChan{
-		trimdCmd := strings.TrimSpace(res.cmd[0])
-		switch(trimdCmd){
-		case "CHECKSUM":
-			wg.Add(1)
-			go checkSum(res.cmd[1])
-		case "WORDCOUNT":
-			wg.Add(1)
-			go wordCount(res.cmd[1])
-		case "WORDFREQ":
-			wg.Add(1)
-			go wordFreq(res.cmd[1], res.cmd[2])
-		default:
-			fmt.Println("Invalid command: ", res.cmd[0])
-		}
-	}
-}
-
-//Produce work request to be done using csv
-func produce(filename string, cmdChan chan cmdWrap){
+//Produce work request to be done using csv, trimming white space from values
+func cmdReader(filename string){
 	defer wg.Done()
 	cmds, _ := os.Open(filename)
 	defer cmds.Close()
@@ -105,17 +83,28 @@ func produce(filename string, cmdChan chan cmdWrap){
 		if err == io.EOF{
 			break
 		}
-
-		cmdWrapped := cmdWrap{cmd:record}
-		cmdChan <- cmdWrapped
+		cmd := strings.TrimSpace(record[0])
+		arg1 := strings.TrimSpace(record[1])
+		switch(cmd){
+		case "CHECKSUM":
+			wg.Add(1)
+			go checkSum(arg1)
+		case "WORDCOUNT":
+			wg.Add(1)
+			go wordCount(arg1)
+		case "WORDFREQ":
+			wg.Add(1)
+			arg2 := strings.TrimSpace(record[2])
+			go wordFreq(arg1, arg2)
+		default:
+			fmt.Println("Invalid command: ", cmd)
+		}
 	}
 }
 
 func main(){
 	filename := os.Args[1]
-	cmdChan := make(chan cmdWrap)
-	wg.Add(2)
-	go produce(filename, cmdChan)
-	go consume(cmdChan)
+	wg.Add(1)
+	go cmdReader(filename)
 	wg.Wait()
 }
