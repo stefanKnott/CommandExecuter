@@ -1,0 +1,6 @@
+CHECKSUM ,blog1.txt
+ WORDCOUNT  ,blog2.txt
+WORDFREQ	,blog1.txt,rule
+	WORDFREQ	,blog2.txt,report
+	CHECKSUM ,blog2.txt
+WORDCOUNT,   blog1.txt
