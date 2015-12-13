@@ -72,14 +72,15 @@ func wordFreq(filename string , word string){
 	fmt.Printf("WORDFREQ, %s, %s, %.3f, %v\n", filename, word, float64(wc)/float64(totWc), dur)
 }
 
-//Consume work to be done, spinning up new goroutine for each command
+//Consume work requests, spinning up new goroutine for each command
 func consume(cmdChan chan cmdWrap){
 	defer wg.Done()
 	for res := range cmdChan{
-		switch(res.cmd[0]){
+		trimdCmd := strings.TrimSpace(res.cmd[0])
+		switch(trimdCmd){
 		case "CHECKSUM":
-			//wg.Add(1)
-			//go checkSum(record[1])
+			wg.Add(1)
+			go checkSum(res.cmd[1])
 		case "WORDCOUNT":
 			wg.Add(1)
 			go wordCount(res.cmd[1])
@@ -87,15 +88,15 @@ func consume(cmdChan chan cmdWrap){
 			wg.Add(1)
 			go wordFreq(res.cmd[1], res.cmd[2])
 		default:
-			break
+			fmt.Println("Invalid command: ", res.cmd[0])
 		}
 	}
 }
 
-//Produce work to be done using csv package to read comma seperated command values in command_file.txt
-func produce(cmdChan chan cmdWrap){
+//Produce work request to be done using csv
+func produce(filename string, cmdChan chan cmdWrap){
 	defer wg.Done()
-	cmds, _ := os.Open("command_file.txt")
+	cmds, _ := os.Open(filename)
 	defer cmds.Close()
 
 	r := csv.NewReader(bufio.NewReader(cmds))
@@ -111,9 +112,10 @@ func produce(cmdChan chan cmdWrap){
 }
 
 func main(){
+	filename := os.Args[1]
 	cmdChan := make(chan cmdWrap)
 	wg.Add(2)
-	go produce(cmdChan)
+	go produce(filename, cmdChan)
 	go consume(cmdChan)
 	wg.Wait()
 }
