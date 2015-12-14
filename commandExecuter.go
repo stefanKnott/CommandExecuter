@@ -24,17 +24,15 @@ type recWrap struct {
 	input []string //command input
 }
 
-func checkSum(filename string) {
-	//startTime := time.Now()
-	//	defer wg.Done()
-	fmt.Println("checksum")
-	//dur := time.Since(startTime)
+func checkSum(filename string){//, csChan chan output) {
+	startTime := time.Now()
+	dur := time.Since(startTime)
+	fmt.Printf("CHECKSUM, %s, %v\n", filename, dur)
 }
 
 //NOTE: words connected by a hyphen are counted as one whole word
-func wordCount(filename string, wcChan chan output) {
+func wordCount(filename string){//, wcChan chan output) {
 	startTime := time.Now()
-	//	defer wg.Done()
 	file, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)
@@ -48,11 +46,11 @@ func wordCount(filename string, wcChan chan output) {
 		wc += len(words)
 	}
 	dur := time.Since(startTime)
-	wcChan <- output{filename: filename, count: wc, dur: dur, word: ""}
+	fmt.Printf("WORDCOUNT, %s, %d, %v\n", filename, wc, dur)
 }
 
 //Checks the frequency of occurance of word within a file with a given filename
-func wordFreq(filename string, word string, wfChan chan output) {
+func wordFreq(filename string, word string){
 	startTime := time.Now()
 	//defer wg.Done()
 	file, err := os.Open(filename)
@@ -73,78 +71,41 @@ func wordFreq(filename string, word string, wfChan chan output) {
 	}
 
 	dur := time.Since(startTime)
-	wfChan <- output{filename: filename, word: word, count: wc, dur: dur}
-}
-
-//Spin up routines collecting output data from given channels, close channels when done extracting data
-func outputCollector(wcChan chan output, wfChan chan output, csChan chan output) {
-	go func(wcChan chan output) {
-		for res := range wcChan {
-			fmt.Printf("WORDCOUNT, %s, %d, %v\n", res.filename, res.count, res.dur)
-		}
-	}(wcChan)
-
-	go func(wfChan chan output) {
-		for res := range wfChan {
-			fmt.Printf("WORDFREQ, %s, %s, %d, %v\n", res.filename, res.word, res.count, res.dur)
-		}
-	}(wfChan)
-
-	/*go func(){
-		defer close(csChan)
-		for res := range csChan{
-			fmt.Println(res)
-			//fmt.Println("CHECKSUM, %s, %s, %d, %v\n", res.filename, res.word, res.count, res.dur)
-		}
-	}()*/
-	csChan = nil
+	fmt.Printf("WORDFREQ, %s, %s, %d, %v\n", filename, word, wc, dur)
 }
 
 //Consume command requests, spin up 5 goroutines to read these requests via recordChan
 func cmdConsumer(recordChan chan recWrap) {
-	var lwg sync.WaitGroup //local waitgroup needed to ensure channels get closed properly
-
-	wcChan := make(chan output)
-	wfChan := make(chan output)
-	csChan := make(chan output)
-	defer close(wcChan)
-	defer close(wfChan)
-	defer close(csChan)
-
-	go outputCollector(wcChan, wfChan, csChan)
+	defer wg.Done()
 
 	for i := 0; i < 5; i++ {
-
-		lwg.Add(1)
 		go func() {
 			for record := range recordChan {
-
 				cmd := strings.TrimSpace(record.input[0])
-				filename := strings.TrimSpace(record.input[1])
-
-				switch cmd {
+				arg1 := strings.TrimSpace(record.input[1])
+				switch (cmd) {
 				case "CHECKSUM":
-					checkSum(filename)
+					checkSum(arg1)
 				case "WORDCOUNT":
-					wordCount(filename, wcChan)
+					wordCount(arg1)
 				case "WORDFREQ":
-					word := strings.TrimSpace(record.input[2])
-					wordFreq(filename, word, wfChan)
+					arg2 := strings.TrimSpace(record.input[2])
+					wordFreq(arg1, arg2)
 				default:
-					fmt.Println("Invalid command: ", cmd)
+					fmt.Println("Invalid line: ", record.input)
 				}
 			}
-			lwg.Done()
-
 		}()
 	}
-	lwg.Wait()
 }
 
 //Produce command requests to be done using csv package
 func cmdProducer(cmdFile string, recordChan chan recWrap) {
 	defer wg.Done()
-	cmds, _ := os.Open(cmdFile)
+	cmds, err := os.Open(cmdFile)
+	if err != nil{
+		log.Fatal(err)
+	}
 	defer cmds.Close()
 
 	r := csv.NewReader(bufio.NewReader(cmds))
@@ -160,8 +121,12 @@ func cmdProducer(cmdFile string, recordChan chan recWrap) {
 
 func main() {
 	recordChan := make(chan recWrap)
+	if len(os.Args) != 2{
+		fmt.Println("Use format: ./commandExecuter <command_file.txt>")
+		log.Fatal()
+	}
 	cmdFile := os.Args[1]
-	wg.Add(1)
+	wg.Add(2)
 	go cmdProducer(cmdFile, recordChan)
 	go cmdConsumer(recordChan)
 	wg.Wait()
