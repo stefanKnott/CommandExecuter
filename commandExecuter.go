@@ -24,14 +24,14 @@ type recWrap struct {
 	input []string //command input
 }
 
-func checkSum(filename string){
+func checkSum(filename string)(int, time.Duration){
 	startTime := time.Now()
 	dur := time.Since(startTime)
-	fmt.Printf("CHECKSUM, %s, %v\n", filename, dur)
+	return 0, dur
 }
 
 //NOTE: words connected by a hyphen are counted as one whole word
-func wordCount(filename string){
+func wordCount(filename string)(int, time.Duration){
 	startTime := time.Now()
 	file, err := os.Open(filename)
 	if err != nil {
@@ -40,17 +40,17 @@ func wordCount(filename string){
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
-	wc := 0
+	totWc := 0
 	for scanner.Scan() {
 		words := strings.Fields(scanner.Text())
-		wc += len(words)
+		totWc += len(words)
 	}
 	dur := time.Since(startTime)
-	fmt.Printf("WORDCOUNT, %s, %d, %v\n", filename, wc, dur)
+	return totWc, dur
 }
 
 //Checks the frequency of occurance of word within a file with a given filename
-func wordFreq(filename string, word string){
+func wordFreq(filename string, word string)(int, time.Duration){
 	startTime := time.Now()
 	file, err := os.Open(filename)
 	if err != nil {
@@ -70,7 +70,7 @@ func wordFreq(filename string, word string){
 	}
 
 	dur := time.Since(startTime)
-	fmt.Printf("WORDFREQ, %s, %s, %d, %v\n", filename, word, wc, dur)
+	return wc, dur
 }
 
 //Consume command requests, spin up 5 goroutines to read these requests via recordChan
@@ -84,12 +84,15 @@ func cmdConsumer(recordChan chan recWrap) {
 				arg1 := strings.TrimSpace(record.input[1])
 				switch (strings.ToUpper(cmd)) {
 				case "CHECKSUM":
-					checkSum(arg1)
+					cs, dur := checkSum(arg1)
+					fmt.Printf("%s,%s, %d, %v\n", record.input[0], record.input[1], cs, dur)
 				case "WORDCOUNT":
-					wordCount(arg1)
+					totWc, dur := wordCount(arg1)
+					fmt.Printf("%s,%s, %d, %v\n", record.input[0], record.input[1], totWc, dur)
 				case "WORDFREQ":
 					arg2 := strings.TrimSpace(record.input[2])
-					wordFreq(arg1, arg2)
+					wc, dur := wordFreq(arg1, arg2)
+					fmt.Printf("%s,%s, %d, %v\n", record.input[0], record.input[1], wc, dur)
 				default:
 					fmt.Println("Invalid line: ", record.input)
 				}
