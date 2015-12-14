@@ -24,14 +24,14 @@ type recWrap struct {
 	input []string //command input
 }
 
-func checkSum(filename string){//, csChan chan output) {
+func checkSum(filename string){
 	startTime := time.Now()
 	dur := time.Since(startTime)
 	fmt.Printf("CHECKSUM, %s, %v\n", filename, dur)
 }
 
 //NOTE: words connected by a hyphen are counted as one whole word
-func wordCount(filename string){//, wcChan chan output) {
+func wordCount(filename string){
 	startTime := time.Now()
 	file, err := os.Open(filename)
 	if err != nil {
@@ -52,7 +52,6 @@ func wordCount(filename string){//, wcChan chan output) {
 //Checks the frequency of occurance of word within a file with a given filename
 func wordFreq(filename string, word string){
 	startTime := time.Now()
-	//defer wg.Done()
 	file, err := os.Open(filename)
 	if err != nil {
 		log.Fatal(err)
@@ -83,7 +82,7 @@ func cmdConsumer(recordChan chan recWrap) {
 			for record := range recordChan {
 				cmd := strings.TrimSpace(record.input[0])
 				arg1 := strings.TrimSpace(record.input[1])
-				switch (cmd) {
+				switch (strings.ToUpper(cmd)) {
 				case "CHECKSUM":
 					checkSum(arg1)
 				case "WORDCOUNT":
