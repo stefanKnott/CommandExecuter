@@ -14,28 +14,63 @@ import (
 
 var wg sync.WaitGroup
 
-type output struct {
-	filename, word string
-	count          int
-	dur            time.Duration
-}
-
+/*
+Wrapper needed to pass command string array over channel cleanly
+*/
 type recWrap struct {
-	input []string //command input
+	input []string 
 }
 
+/*
+Performs checksum on the word count of a file
+I was fuzzy as what to do here without further clarification
+
+Assumptions:
+	--8 bits restricts to values 0-255
+	--check sum found via inverting sum of data (wc) and adding one
+
+Params: 
+	filename: name of file to be used in wordCount call
+Return:
+	int: a check sum for the word count
+	time.Duration: how long the checkSum operation took
+*/
 func checkSum(filename string)(int, time.Duration){
 	startTime := time.Now()
+	wc, _ := wordCount(filename)
+	if wc == -1000{
+		return -1000, time.Since(startTime)
+	}
+	
+	//limit to 8bit representation
+	wc %= 256
+
+	//two's comp
+	ch := ^wc + 1
+
 	dur := time.Since(startTime)
-	return 0, dur
+	return ch, dur
 }
 
-//NOTE: words connected by a hyphen are counted as one whole word
+/*
+Counts number of words within a file
+Uses strings.Fields to seperate words by whitespace..much faster than regexing \S+\s+ repeatedly and incrementing counter
+
+Assumptions:
+	--all hyphenated words coun't as one word
+	--words are seperated by whitespace
+
+Params:
+	filename: name of file to perform word count upon
+Return:
+	int: word count
+	time.Duration: how long the word count operation took 
+*/
 func wordCount(filename string)(int, time.Duration){
 	startTime := time.Now()
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		return -1000, time.Since(startTime)
 	}
 	defer file.Close()
 
@@ -49,12 +84,26 @@ func wordCount(filename string)(int, time.Duration){
 	return totWc, dur
 }
 
-//Checks the frequency of occurance of word within a file with a given filename
+/*
+Checks the frequency of occurance of word within a file with a given filename
+Uses strings.Fields to seperate words by whitespace..much faster than regexing \S+\s+ repeatedly and incrementing counter
+
+Assumptions for search "report":
+	--only "report", "report," or "report." count as an occurance of "report"
+	--instances such as "Report" and "Report-..." would not count as an occurance as they most likely have different meanings than the desired word
+
+Params:
+	filename: name of file to open and measure word frequency on
+	word: search for repetitions of this word
+Return:
+	int: number of occurances of word
+	time.Duration: how long the word frequency operation took
+*/
 func wordFreq(filename string, word string)(int, time.Duration){
 	startTime := time.Now()
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		return -1000, time.Since(startTime)
 	}
 	defer file.Close()
 
@@ -63,7 +112,7 @@ func wordFreq(filename string, word string)(int, time.Duration){
 	for scanner.Scan() {
 		words := strings.Fields(scanner.Text())
 		for _, lword := range words {
-			if lword == word || lword == word+"," {
+			if lword == word || lword == word+"," || lword == word+"."{
 				wc += 1
 			}
 		}
@@ -73,7 +122,16 @@ func wordFreq(filename string, word string)(int, time.Duration){
 	return wc, dur
 }
 
-//Consume command requests, spin up 5 goroutines to read these requests via recordChan
+/*
+Consume command requests, spin up 5 goroutines to read these requests via channel from producer
+
+Assumptions:
+	--variations of command input possible in spacing, capitalization variations allowed for command names
+	--system limits not infinite (limit open files, and concurrent ops)
+
+Params:
+	recordChan: channel by which consumer reads command input data from cmdProducer goroutine
+*/
 func cmdConsumer(recordChan chan recWrap) {
 	defer wg.Done()
 
@@ -81,18 +139,30 @@ func cmdConsumer(recordChan chan recWrap) {
 		go func() {
 			for record := range recordChan {
 				cmd := strings.TrimSpace(record.input[0])
-				arg1 := strings.TrimSpace(record.input[1])
-				switch (strings.ToUpper(cmd)) {
+				switch (strings.ToUpper(cmd)){
 				case "CHECKSUM":
-					cs, dur := checkSum(arg1)
+					cs, dur := checkSum(strings.TrimSpace(record.input[1]))
+					if cs == -1000{
+						fmt.Println("Invalid line:", record.input)
+						continue
+					}
 					fmt.Printf("%s,%s, %d, %v\n", record.input[0], record.input[1], cs, dur)
 				case "WORDCOUNT":
-					totWc, dur := wordCount(arg1)
+					totWc, dur := wordCount(strings.TrimSpace(record.input[1]))
+
+					if totWc == -1000{
+						fmt.Println("Invalid line:", record.input)
+						continue
+					}
 					fmt.Printf("%s,%s, %d, %v\n", record.input[0], record.input[1], totWc, dur)
 				case "WORDFREQ":
-					arg2 := strings.TrimSpace(record.input[2])
-					wc, dur := wordFreq(arg1, arg2)
-					fmt.Printf("%s,%s, %d, %v\n", record.input[0], record.input[1], wc, dur)
+					wc, dur := wordFreq(strings.TrimSpace(record.input[1]), 
+										strings.TrimSpace(record.input[2]))
+					if wc == -1000{
+						fmt.Println("Invalid line:", record.input)
+						continue
+					}
+					fmt.Printf("%s,%s,%s, %d, %v\n", record.input[0], record.input[1], record.input[2], wc, dur)
 				default:
 					fmt.Println("Invalid line: ", record.input)
 				}
@@ -101,7 +171,13 @@ func cmdConsumer(recordChan chan recWrap) {
 	}
 }
 
-//Produce command requests to be done using csv package
+/*
+Produce command requests to be done using csv package, send to consumer over channel
+
+Params:
+	cmdFile: name of file which holds command list to run
+	recordChan: channel over which command lines are read and passed to cmdConsumer goroutine
+*/
 func cmdProducer(cmdFile string, recordChan chan recWrap) {
 	defer wg.Done()
 	cmds, err := os.Open(cmdFile)
@@ -121,6 +197,9 @@ func cmdProducer(cmdFile string, recordChan chan recWrap) {
 	}
 }
 
+/*
+Spin up producer and consumers to handle work queries
+*/
 func main() {
 	recordChan := make(chan recWrap)
 	if len(os.Args) != 2{
