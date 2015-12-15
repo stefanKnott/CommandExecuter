@@ -6,16 +6,26 @@ import(
 	"fmt"
 )
 
-func TestFormat(t *testing.T){
-	out, err := exec.Command("./commandExecuter", "command_file.txt").Output()
-	if err == nil && len(out) != 0{
+func TestSpacedFormat(t *testing.T){
+	out, err := exec.Command("./commandExecuter", "command_file_spaced.txt").Output()
+	if err != nil && len(out) == 0{
 		t.Error("exec.Command call failed")
 	}
-	fmt.Print(string(out[:]))
+	fmt.Print(string(out))
+}
 
-	out, err = exec.Command("./commandExecuter", "command_file_spaced.txt").Output()
-	if err == nil && len(out) != 0{
+func TestMixedFormat(t *testing.T){
+	out, err := exec.Command("./commandExecuter", "command_file_mixed.txt").Output()
+	if err != nil && len(out) == 0{
 		t.Error("exec.Command call failed")
 	}
-	fmt.Print(string(out[:]))
+	fmt.Print(string(out))
+}
+
+func TestInvalidFormat(t *testing.T){
+	out, err := exec.Command("./commandExecuter", "command_file_invalid.txt").Output()
+	if err != nil && len(out) == 0{
+		t.Error("exec.Command call failed")
+	}
+	fmt.Print(string(out))
 }
