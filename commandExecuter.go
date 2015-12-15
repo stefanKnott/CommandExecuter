@@ -1,3 +1,8 @@
+//Written by Stefan Knott Fall 2015
+/*Note: Error code -1000 is used in this program to denote an error opening a file.  -1000 was chosen
+as to never potentially interfere with 8bit checksum information
+*/
+
 package main
 
 import (
@@ -38,7 +43,7 @@ Return:
 func checkSum(filename string)(int, time.Duration){
 	startTime := time.Now()
 	wc, _ := wordCount(filename)
-	if wc == -1000{
+	if wc == -1000{	//error opening file
 		return -1000, time.Since(startTime)
 	}
 	
