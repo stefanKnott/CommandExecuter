@@ -12,8 +12,8 @@ Files included:
   
 
 To build and run:
-go build commandExecuter.go
-./commandExecuter <command_file_name>
+  go build commandExecuter.go
+  ./commandExecuter <command_file_name>
 
 To display test script output:
-go test -v
+  go test -v
