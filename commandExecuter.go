@@ -18,8 +18,6 @@ import (
 )
 
 var wg sync.WaitGroup
-var mutex = &sync.Mutex{}
-
 
 /*
 Wrapper needed to pass command string array over channel cleanly
@@ -195,9 +193,7 @@ func cmdProducer(cmdFile string, recordChan chan recWrap) {
 
 	r := csv.NewReader(bufio.NewReader(cmds))
 	for {
-		mutex.Lock()
 		record, err := r.Read()
-		mutex.Unlock()
 		if err == io.EOF {
 			break
 		}
@@ -211,6 +207,7 @@ Spin up producer and consumers to handle work queries
 */
 func main() {
 	recordChan := make(chan recWrap)
+	defer close(recordChan)
 	if len(os.Args) != 2{
 		fmt.Println("Use format: ./commandExecuter <command_file.txt>")
 		log.Fatal()
