@@ -2,7 +2,7 @@
 
 Files included:
   blog1-3.txt: Example text used for testing
-  commandExecuter.go:  Here lies the Command Executer program.  Performs checksum, word count, and word frequency
+  commandExecuter.go:  Here lies the Command Executer program.  Performs checksum, word count, and word frequency.
   command_file.txt: Original command file
   command_file_invalid.txt: Command file with invalid commands, used for testing
   command_file_spaced.txt: Command file with commands surrounded by varying white space, used for testing
