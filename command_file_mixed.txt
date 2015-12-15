@@ -1,0 +1,20 @@
+rdFREQ,blog1.txt,rule
+WORDFREQ,blog2.txt,report
+cHECKSUM,blog2.txt
+wordcount,blog1.txt
+checksum ,blog3.txt
+CHECKsum ,blog1.txt
+WORDFREq  ,blog2.txt,  hello
+ WORDFREQ,blog1.txt,logrhythm
+wordFREQ,blog3.txt,logrhythm
+WORDCOUNT	,blog1.txt
+WORDCOUnt ,blog2.txt
+WORDCounT,blog3.txt
+WORDFREQ,blog3.txt,the
+WORDFReQ,blog3.txt,colorado
+WORDCOUNT,blog2.txt
+WORDFREQ,blog1.txt,antarctica
+CHECKSUM,blog1.txt
+WORDFREQ,blog2.txt,a
+WORDFREQ,blog2.txt,siem
+
