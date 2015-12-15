@@ -31,7 +31,6 @@ Performs checksum on the word count of a file
 I was fuzzy as what to do here without further clarification
 
 Assumptions:
-	--8 bits restricts to values 0-255
 	--check sum found via inverting sum of data (wc) and adding one
 
 Params: 
