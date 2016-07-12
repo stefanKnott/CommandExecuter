@@ -17,3 +17,5 @@ To build and run:
 
 To display test script output:
   go test -v
+
+Done as programming assignment for interview
