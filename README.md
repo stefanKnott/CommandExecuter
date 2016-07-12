@@ -11,9 +11,11 @@ Files included:
     Note: this does not perform unit tests, but is just used for gauging valid program performace via output to stdout
   
 
-To build and run:
+To build:
   go build commandExecuter.go
-  ./commandExecuter <command_file_name>
+
+To run:
+  ./commandExecuter 'command_file_name'
 
 To display test script output:
   go test -v
